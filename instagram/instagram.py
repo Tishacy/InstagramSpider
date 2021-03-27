@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 # Author: Tishacy
 # Date: 2021-03-26
-import pandas as pd
+import os
 import logging
+import pandas as pd
 
 from .query import Query
 from .parser import PostParser, CommentParser, TagPostParser
+from .downloader import Downloader, Resource
 from .common import POSTS_QUERY_HASH_PARAM, \
     COMMENTS_QUERY_HASH_PARAM, TAG_POSTS_QUERY_HASH_PARAM
 
@@ -115,6 +117,43 @@ def task_fetch_tag_posts_and_comments(
     logger.info("Save the comments data to %s." % comments_out)
 
 
+def task_download_pics(data_fpath, url_field='display_image_url', out_fields=None, out_dir='pics', overwrite=False):
+    """[Task] Download all pics to files.
+    :param data_fpath: data file path
+    :param url_field: field of pic urls in the data file.
+    :param out_fields: fields of output names in the data file, using '-' to join these fields.
+    :param out_dir: output directory of downloaded pics.
+    :param overwrite: whether to overwrite the existing files
+    :return None:
+    """
+    if data_fpath is None or not isinstance(data_fpath, str):
+        raise ValueError("data_fpath must be a string.")
+
+    if not os.path.exists(data_fpath):
+        raise FileNotFoundError("data_fpath is not found.")
+
+    _, ext = os.path.splitext(data_fpath)
+    if ext not in ['.xls', '.xlsx']:
+        raise TypeError("data_fpath must be an excel file path with the extension of .xls or .xlsx, but got %s" % ext)
+
+    if out_fields is None:
+        out_fields = ['short_code']
+
+    data_df = pd.read_excel(data_fpath)
+    resources = []
+    for i, item in data_df.iterrows():
+        url = item[url_field]
+        _, ext = os.path.splitext(url.split("?")[0])
+        out_fname = '-'.join([item[out_field] for out_field in out_fields]) + ext
+        out = os.path.join(out_dir, out_fname)
+        resources.append(Resource(url, out))
+
+    downloader = Downloader(max_workers=10)
+    downloader.download(resources)
+
+
 if __name__=="__main__":
     task_fetch_posts_and_comments("586319507", 28, 'data/posts_data.xlsx', 'data/comments_data.xlsx')
     task_fetch_tag_posts_and_comments("pringles", 100, 'data/tag_posts_data.xlsx', 'data/tag_comments_data.xlsx')
+    task_download_pics('data/posts_data.xlsx', 'display_image_url', ['short_code'], out_dir='pics/posts_pics', overwrite=False)
+    task_download_pics('data/tag_posts_data.xlsx', 'display_image_url', ['short_code'], out_dir='pics/tag_posts_pics', overwrite=False)

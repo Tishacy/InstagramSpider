@@ -14,11 +14,14 @@ InstagramSpider
 │   ├── parser.py               // Parser classes
 │   ├── query.py                // Query class
 │   └── test.py                 // Test functions
-└── data                    // Output data directory
-    ├── comments_data.xlsx
-    ├── posts_data.xlsx
-    ├── tag_comments_data.xlsx
-    └── tag_posts_data.xlsx
+│── data                    // Output data directory
+│   ├── comments_data.xlsx
+│   ├── posts_data.xlsx
+│   ├── tag_comments_data.xlsx
+│   └── tag_posts_data.xlsx
+└── pics                   // Pics of posts
+   ├── posts_pics             // pics of one's posts 
+   └── tag_posts_pics         // pics of posts of a tag
 ```
 
 ## Usage
@@ -43,6 +46,8 @@ InstagramSpider
     if __name__=="__main__":
         task_fetch_posts_and_comments("586319507", 28, 'data/posts_data.xlsx', 'data/comments_data.xlsx')
         task_fetch_tag_posts_and_comments("pringles", 100, 'data/tag_posts_data.xlsx', 'data/tag_comments_data.xlsx')
+        task_download_pics('data/posts_data.xlsx', 'display_image_url', ['short_code'], out_dir='pics/posts_pics', overwrite=False)
+        task_download_pics('data/tag_posts_data.xlsx', 'display_image_url', ['short_code'], out_dir='pics/tag_posts_pics', overwrite=False)
     ```
    
 2. Run tasks in `instagram/instagram.py`.

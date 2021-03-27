@@ -5,7 +5,7 @@
 import configparser
 
 # Load configurations
-config = configparser.ConfigParser()
+config = configparser.ConfigParser(interpolation=None)
 config.read("config.ini")
 
 sess_config = config['HttpSession']
