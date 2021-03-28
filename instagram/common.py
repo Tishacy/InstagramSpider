@@ -15,6 +15,8 @@ query_config = config['QueryAPI']
 # Http session
 USER_AGENT = sess_config['UserAgent']
 COOKIE = sess_config['Cookie']
+HTTP_PROXY = sess_config['HttpProxy'] if config.has_option('HttpSession', 'HttpProxy') else None
+HTTPS_PROXY = sess_config['HttpsProxy'] if config.has_option('HttpSession', 'HttpsProxy') else None
 
 # Query api hash codes
 POSTS_QUERY_HASH_PARAM = query_config['PostsQueryHash']

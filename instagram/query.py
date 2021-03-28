@@ -18,18 +18,28 @@ class Query:
     :argument parser_cls: a parser class
     """
     def __init__(self, parser_cls):
-        self.parser_cls = parser_cls
-        self.sess = self.init_sess()
-        self.base_api = "https://www.instagram.com/graphql/query/?query_hash=%s&variables=%s"
+        self._parser_cls = parser_cls
+        self._proxies = self._init_proxies()
+        self._sess = self._init_sess()
+        self._base_api = "https://www.instagram.com/graphql/query/?query_hash=%s&variables=%s"
 
     @staticmethod
-    def init_sess():
+    def _init_sess():
         sess = requests.Session()
         sess.headers.update({
             'User-Agent': USER_AGENT,
             'Cookie': COOKIE
         })
         return sess
+
+    @staticmethod
+    def _init_proxies():
+        proxies = {}
+        if HTTP_PROXY:
+            proxies['http'] = HTTP_PROXY
+        if HTTPS_PROXY:
+            proxies['https'] = HTTPS_PROXY
+        return proxies
 
     def query_batch(self, query_hash, variables):
         """Query batch data.
@@ -38,19 +48,19 @@ class Query:
         :rtype Tuple[List[Dict], Dict, Dict]:
         """
         dump_variables = json.dumps(variables)
-        filled_api = self.base_api % (query_hash, dump_variables)
+        filled_api = self._base_api % (query_hash, dump_variables)
 
-        res = self.sess.get(filled_api)
+        res = self._sess.get(filled_api, proxies=self._proxies)
         data = json.loads(res.content.decode())
 
         while 'status' in data and data['status'] != 'ok':
             # return [], variables, { 'has_next': True }
             time.sleep(5)
             logger.info("Retrying...")
-            res = self.sess.get(filled_api)
+            res = self._sess.get(filled_api, proxies=self._proxies)
             data = json.loads(res.content.decode())
 
-        parser = self.parser_cls(data, variables)
+        parser = self._parser_cls(data, variables)
         parsed_data = parser.parse_data()
         next_variables = parser.parse_next_variables()
         page_info = parser.parse_page_info()

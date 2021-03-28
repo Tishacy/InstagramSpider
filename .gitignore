@@ -1,5 +1,7 @@
 data
 pics
+videos
 __pycache__
+instagram/__pycache__/
 .idea
 .DS_Store

@@ -43,12 +43,16 @@ InstagramSpider
     ```python
     # ...
    
-    if __name__=="__main__":
-        task_fetch_posts_and_comments("586319507", 28, 'data/posts_data.xlsx', 'data/comments_data.xlsx')
-        task_fetch_tag_posts_and_comments("pringles", 100, 'data/tag_posts_data.xlsx', 'data/tag_comments_data.xlsx')
-        task_download_pics('data/posts_data.xlsx', 'display_image_url', ['short_code'], out_dir='pics/posts_pics', overwrite=False)
-        task_download_pics('data/tag_posts_data.xlsx', 'display_image_url', ['short_code'], out_dir='pics/tag_posts_pics', overwrite=False)
-    ```
+   if __name__=="__main__":
+        author_id = "<Author ID>"
+        task_fetch_posts(author_id, 1000, f'data/{author_id}.xlsx')
+        task_download_resources(f'data/{author_id}.xlsx', 'display_image_url', ['short_code'], out_dir=f'pics/{author_id}', overwrite=False)
+        task_download_resources(f'data/{author_id}.xlsx', 'video_url', ['short_code'], out_dir=f'videos/{author_id}', overwrite=False)
+    
+        tag_name = '<Tag Name>'
+        task_fetch_tag_posts(tag_name, 1000, f'data/{tag_name}.xlsx')
+        task_download_resources(f'data/{tag_name}.xlsx', 'display_image_url', ['short_code'], out_dir=f'pics/{tag_name}', overwrite=False)
+   ```
    
 2. Run tasks in `instagram/instagram.py`.
     ```bash

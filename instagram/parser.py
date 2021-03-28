@@ -66,8 +66,10 @@ class PostParser(Parser):
         return {
             'id': node['id'],
             'short_code': node['shortcode'],
-            'text': node['edge_media_to_caption']['edges'][0]['node']['text'],
+            'text': node['edge_media_to_caption']['edges'][0]['node']['text'] if len(node['edge_media_to_caption']['edges']) > 0 else '',
             'display_image_url': node['display_url'],
+            'is_video': node['is_video'],
+            'video_url': node['video_url'] if node['is_video'] else '',
             'timestamp': node['taken_at_timestamp'],
             'formatted-time': datetime.fromtimestamp(int(node['taken_at_timestamp'])).strftime('%Y-%m-%d %H:%M:%S'),
             'likes_count': node['edge_media_preview_like']['count'],
@@ -125,7 +127,6 @@ class TagPostParser(Parser):
 
     def parse_data(self):
         edges = self.data['data']['hashtag']['edge_hashtag_to_media']['edges']
-
         parsed_data = []
         for edge in edges:
             node_info = self.get_info(edge['node'])
@@ -150,8 +151,9 @@ class TagPostParser(Parser):
         return {
             'id': node['id'],
             'short_code': node['shortcode'],
-            'text': node['edge_media_to_caption']['edges'][0]['node']['text'],
+            'text': node['edge_media_to_caption']['edges'][0]['node']['text'] if len(node['edge_media_to_caption']['edges']) > 0 else '',
             'display_image_url': node['display_url'],
+            'is_video': node['is_video'],
             'timestamp': node['taken_at_timestamp'],
             'formatted-time': datetime.fromtimestamp(int(node['taken_at_timestamp'])).strftime('%Y-%m-%d %H:%M:%S'),
             'likes_count': node['edge_media_preview_like']['count'],
