@@ -10,6 +10,7 @@ InstagramSpider
 ├── instagram               // Source code directory
 │   ├── __init__.py
 │   ├── common.py               // Global variables
+│   ├── downloader.py           // Download-related classes
 │   ├── instagram.py            // Core tasks 
 │   ├── parser.py               // Parser classes
 │   ├── query.py                // Query class
