@@ -9,7 +9,7 @@ import concurrent
 from concurrent.futures import ThreadPoolExecutor
 from collections import Iterable
 
-from .common import USER_AGENT, COOKIE
+from .common import USER_AGENT, COOKIE, HTTP_PROXY, HTTPS_PROXY
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
@@ -19,6 +19,7 @@ logger = logging.getLogger('downloader')
 class Downloader:
     def __init__(self, max_workers=None):
         self._executor = ThreadPoolExecutor(max_workers=max_workers)
+        self._proxies = self._init_proxies()
         self._sess = self._init_sess()
 
     @staticmethod
@@ -29,6 +30,15 @@ class Downloader:
             'Cookie': COOKIE
         })
         return sess
+
+    @staticmethod
+    def _init_proxies():
+        proxies = {}
+        if HTTP_PROXY:
+            proxies['http'] = HTTP_PROXY
+        if HTTPS_PROXY:
+            proxies['https'] = HTTPS_PROXY
+        return proxies
 
     @staticmethod
     def _split_name(url):
@@ -62,7 +72,7 @@ class Downloader:
         # Fetch resource with the given url.
         try:
             logger.info("Fetch the url: %s." % url)
-            res = self._sess.get(url, timeout=timeout)
+            res = self._sess.get(url, timeout=timeout, proxies=self._proxies)
 
             if str(res.status_code)[0] != '2':
                 return False
